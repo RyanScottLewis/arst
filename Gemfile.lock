@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    arst (0.0.0)
+    arst (0.0.1)
       active_support (~> 3.0.0)
       parslet (~> 1.5.0)
       version (~> 1.0.0)

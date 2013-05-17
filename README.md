@@ -73,7 +73,7 @@ module Bar
 </td></tr><table>
   
 When interpreting the ARST syntax, the parser accepts any number of identical sequential whitespace characters
-at the starst of a line as an "indentation step".  
+at the start of a line as an "indentation step".  
 Valid whitespace characters are the space (` `) and tab (`\t`) characters.
 
 Once the first indentation step is found while parsing, all subsequent indentation steps must contain the same
