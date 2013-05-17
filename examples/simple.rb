@@ -20,12 +20,14 @@ rescue ARST::Parser::ParseFailed => failure
 end
 
 __END__
-module Test
-  class Bar
-  module Foo
-    module Baz
-      module Qux
-      module NoWai
-module UserSystem
-  class User
-  class Admin < User
+module StupidModel
+  module Validations
+  module Callbacks
+  module Serialization
+    module ClassMethods
+    module InstanceMethods
+  class Base
+    extend Callbacks
+    include Validations
+    include Serialization
+class User < StupidModel::Base

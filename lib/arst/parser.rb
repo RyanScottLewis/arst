@@ -15,11 +15,10 @@ module ARST
     
     rule(:space)   { match('[\t\s]') }
     rule(:spaces)  { space.repeat(1) }
-    # rule(:newline) { match('\n') }
-    rule(:newline) { str("\n") }
+    rule(:newline) { match('\n') }
     
     rule :constant do
-      match('[A-Z]') >> match('[A-Za-z0-9]').repeat(1)
+      match('[A-Z]') >> ( match('[A-Za-z0-9]') | str('::') ).repeat(1) # TODO: Cannot end with '::'
     end
     
     rule :module_keyword do
@@ -33,17 +32,23 @@ module ARST
       ).maybe
     end
     
-    rule :keyword do
-      (class_keyword | module_keyword)#.as(:identifier)
+    rule :include_keyword do
+      str('include') >> space >> constant.as(:include)
+    end
+    
+    rule :extend_keyword do
+      str('extend') >> space >> constant.as(:extend)
     end
     
     def node(depth)
       indent(depth) >> 
       (
-        keyword >> newline.maybe >> 
+        ( class_keyword | module_keyword ) >> newline.maybe >>
         (
           dynamic { |soutce, context| node(depth+1).repeat(0) }
-        ).as(:children) | newline
+        ).as(:children) |
+        ( include_keyword | extend_keyword ) >> newline.maybe |
+        newline
       )
     end 
     
