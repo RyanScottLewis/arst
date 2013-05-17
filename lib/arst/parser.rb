@@ -1,4 +1,4 @@
-require 'parslet' 
+require 'parslet'
 
 module ARST
   
@@ -27,9 +27,7 @@ module ARST
     
     rule :class_keyword do
       str('class') >> spaces >> constant.as(:class) >>
-      (
-        spaces >> str('<') >> spaces >> constant.as(:superclass)
-      ).maybe
+      ( spaces >> str('<') >> spaces >> constant.as(:superclass) ).maybe
     end
     
     rule :include_keyword do
@@ -44,15 +42,13 @@ module ARST
       indent(depth) >> 
       (
         ( class_keyword | module_keyword ) >> newline.maybe >>
-        (
-          dynamic { |soutce, context| node(depth+1).repeat(0) }
-        ).as(:children) |
+        dynamic { |soutce, context| node(depth+1).repeat(0) }.as(:children) |
         ( include_keyword | extend_keyword ) >> newline.maybe |
         newline
       )
     end 
     
-    rule(:document) { node(0).repeat }
+    rule(:document) { node(0).repeat.as(:children) }
     
     root :document
     

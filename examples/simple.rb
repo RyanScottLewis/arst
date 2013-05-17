@@ -4,15 +4,17 @@ require 'ap'
 require 'pp'
 
 begin
-  input = DATA.read
-  
   puts '', '----- input ----------------------------------------------------------------------', ''
+  input = DATA.read
   ap input
   
-  tree = ARST.parse(input)
-  
   puts '', '----- tree -----------------------------------------------------------------------', ''
+  tree = ARST::Parser.parse(input)
   ap tree
+  
+  puts '', '----- output (Ruby, single file) -------------------------------------------------', ''
+  output = ARST::Generator::Ruby.generate(tree)
+  puts output
   
 rescue ARST::Parser::ParseFailed => failure
   puts '', '----- error ----------------------------------------------------------------------', ''
