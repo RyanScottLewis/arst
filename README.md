@@ -72,6 +72,7 @@ module Foo
 <pre>
 module Foo
 module Bar
+</pre>
 </td></tr></table>
   
 When interpreting the ARST syntax, the parser accepts 2 identical sequential whitespace characters
