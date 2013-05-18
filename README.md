@@ -64,15 +64,14 @@ This means that most syntax highlighters for Ruby will also work for ARST.
 ARST is an indentation-sensitive syntax meaning that the following are **not** equivalent:
 
 <table width="100%"><tr><td>
-```rb
+<pre>
 module Foo
   module Bar
-```
+</pre>
 </td><td>
-```rb
+<pre>
 module Foo
 module Bar
-```
 </td></tr></table>
   
 When interpreting the ARST syntax, the parser accepts 2 identical sequential whitespace characters
@@ -84,18 +83,18 @@ amount of whitespace characters as the first step:
 
 <table width="100%"><tr><td>
 <b>Valid</b>
-```rb
+<pre>
 module Foo
   module Bar
     module Baz
-```
+</pre>
 </td><td>
 <b>Invalid</b>
-```rb
+<pre>
 module Foo
   module Bar
          module Baz
-```
+</pre>
 </td></tr></table>
 
 ## Usage
