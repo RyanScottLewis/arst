@@ -12,12 +12,12 @@ module ARST
       end
       
       def generate(options={})
-        parse_children(@tree, 0)
+        parse_children(@tree, options)
       end
       
       protected
       
-      def parse_children(node, depth)
+      def parse_children(node, options={})
         raise NotImplementedError
       end
       

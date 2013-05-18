@@ -6,7 +6,7 @@ require 'pp'
 begin
   puts '', '----- input ----------------------------------------------------------------------', ''
   input = DATA.read
-  ap input
+  puts input
   
   puts '', '----- tree -----------------------------------------------------------------------', ''
   tree = ARST::Parser.parse(input)
@@ -32,4 +32,7 @@ module StupidModel
     extend Callbacks
     include Validations
     include Serialization
-class User < StupidModel::Base
+module StupidRecord
+  module Persistence
+  class Base < StupidModel::Base
+    include Persistence
