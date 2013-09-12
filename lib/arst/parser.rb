@@ -22,20 +22,20 @@ module ARST
     end
     
     rule :module_keyword do
-      str('module') >> spaces >> constant.as(:module)
+      str('module').as(:type) >> spaces >> constant.as(:name)
     end
     
     rule :class_keyword do
-      str('class') >> spaces >> constant.as(:class) >>
+      str('class').as(:type) >> spaces >> constant.as(:name) >>
       ( spaces >> str('<') >> spaces >> constant.as(:superclass) ).maybe
     end
     
     rule :include_keyword do
-      str('include') >> space >> constant.as(:include)
+      str('include').as(:type) >> space >> constant.as(:name)
     end
     
     rule :extend_keyword do
-      str('extend') >> space >> constant.as(:extend)
+      str('extend').as(:type) >> space >> constant.as(:name)
     end
     
     def node(depth)
