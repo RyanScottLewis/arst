@@ -138,6 +138,8 @@ end
 
 ### Generate your code
 
+### Ruby
+
 Running `rake arst:ruby` will generate the following Ruby code in the `lib/stupid_record.rb` file:
 
 ```rb

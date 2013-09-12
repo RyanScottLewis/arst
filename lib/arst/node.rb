@@ -1,0 +1,1 @@
+require 'arst/node/module'

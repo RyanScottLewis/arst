@@ -4,20 +4,25 @@ require 'ap'
 require 'pp'
 
 begin
-  puts '', '----- input ----------------------------------------------------------------------', ''
+  puts '', 'INPUT', ''
   input = DATA.read
   puts input
   
-  puts '', '----- tree -----------------------------------------------------------------------', ''
+  puts '', 'PARSED', ''
   tree = ARST::Parser.parse(input)
   ap tree
   
-  puts '', '----- output (Ruby, single file) -------------------------------------------------', ''
-  output = ARST::Generator::Ruby.generate(tree)
-  puts output
+  puts '', "TRANSFORMED", ''
+  output = ARST::Transformer.apply(tree)
+  ap output
+  
+  # options = { indent_char: "  ", indent_size: 1 }
+  # puts '', "OUTPUT - Ruby, single file, options=#{options}", ''
+  # output = ARST::Generator::Ruby.generate(tree, options)
+  # puts output
   
 rescue ARST::Parser::ParseFailed => failure
-  puts '', '----- error ----------------------------------------------------------------------', ''
+  puts '', 'ERROR', ''
   puts failure.cause.ascii_tree
 end
 

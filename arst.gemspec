@@ -19,7 +19,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'guard-shell',   '~> 0.5.0'
   s.add_development_dependency 'rake',          '~> 10.0.0'
   s.add_development_dependency 'rb-fsevent',    '~> 0.9.0'
-
   
   # Pragmatically set variables
   s.homepage      = "http://github.com/RyanScottLewis/#{s.name}"
@@ -27,7 +26,7 @@ Gem::Specification.new do |s|
   s.description   = s.summary
   s.name          = Pathname.new(__FILE__).basename('.gemspec').to_s
   s.require_paths = ['lib']
-  s.files         = Dir['{{Rake,Gem}file{.lock,},README*,VERSION,LICENSE,*.gemspec,lib/morris-rails{.rb,**/*.rb},spec/**/*.rb,app/**/*.*}']
+  s.files         = Dir['{{Rake,Gem}file{.lock,},README*,VERSION,LICENSE,*.gemspec,{lib,bin,examples,spec,test}/**/*']
   s.test_files    = Dir['{examples,spec,test}/**/*']
   
 end
