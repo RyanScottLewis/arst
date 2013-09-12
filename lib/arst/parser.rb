@@ -1,18 +1,19 @@
 require 'parslet'
+require 'arst/node'
 
 module ARST
   
   # The parser for ARST.
   class Parser < Parslet::Parser
     
-    def self.parse(input)
-      new.parse(input)
+    def self.parse(input, options={})
+      new.parse(input, options)
     end
     
-    def parse(input)
+    def parse(input, options={})
       tree = super(input)
       
-      Node::Root.new(tree)
+      options[:raw] ? tree : Node::Root.new(tree)
     end
     
     def indent(depth)
