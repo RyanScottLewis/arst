@@ -3,7 +3,7 @@ require 'arst/generator/base'
 module ARST
   module Generator
     
-    class CRuby < Base
+    class C < Base
       
     end
     
