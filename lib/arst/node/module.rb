@@ -1,22 +1,12 @@
 require 'arst/node/base'
+require 'arst/node/namable'
 
 module ARST
   module Node
     
     class Module < Base
       
-      attr_reader :name
-      
-      def initialize(options={})
-        super(options)
-        
-        # TODO: Validate keys
-        self.name = options[:name]
-      end
-      
-      def name=(name)
-        @name = name.to_s # TODO: Sanitize
-      end
+      include Namable
       
     end
     

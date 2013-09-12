@@ -7,7 +7,7 @@ module ARST
       
       protected
       
-      # =-=-= Hooks =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      # =-=-= Hooks =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
       
       def default_options
         {
@@ -30,13 +30,13 @@ module ARST
         options[:newline_character] * options[:newline_size]
       end
       
-      # =-=-= Parsers =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      # =-=-= Parsers =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
       
       def parse_children(node, options={})
         options = default_options.merge( options )
         
         if options[:split_files]
-          parse_children_as_single_file(node, options)
+          parse_children_as_multiple_files(node, options)
         else
           parse_children_as_single_file(node, options)
         end
@@ -45,12 +45,12 @@ module ARST
       def parse_children_as_single_file(node, options={})
         output = ''
         
-        node[:children].each do |node|
+        node.children.each do |node|
           output << indent(options)
           output << code_from_node(node)
           output << newline(options)
-          output << parse_children_as_single_file( node, options.merge(depth: options[:depth]+1) ) if node.has_key?(:children)
-          output << "#{ indent(options) }end#{ newline(options) }" if node.has_key?(:module) || node.has_key?(:class)
+          output << parse_children_as_single_file( node, options.merge(depth: options[:depth]+1) ) unless node.children.empty?
+          output << "#{ indent(options) }end#{ newline(options) }" if [:module, :class].include?(node.type)
         end
         
         output
@@ -59,32 +59,35 @@ module ARST
       def parse_children_as_multiple_files(node, options={})
         output = ''
         
-        node[:children].each do |node|
+        node.children.each do |node|
           output << indent(options)
           output << code_from_node(node)
           output << newline(options)
-          output << parse_children_as_multiple_files( node, options.merge(depth: options[:depth]+1) ) if node.has_key?(:children)
-          output << "#{ indent(options) }end#{ newline(options) }" if node.has_key?(:module) || node.has_key?(:class)
+          output << parse_children_as_multiple_files( node, options.merge(depth: options[:depth]+1) ) unless node.children.empty?
+          output << "#{ indent(options) }end#{ newline(options) }" if [:module, :class].include?(node.type)
         end
         
         output
       end
       
-      # =-=-= Helpers =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      # =-=-= Helpers =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
       
-      # TODO: Should pase as node[:type] instead of :module, :class, etc.
       def code_from_node(node)
-        if node[:module]
-          "module #{ node[:module] }"
-        elsif node[:class]
-          code_class = "class #{ node[:class] }"
-          code_subclass = " < #{ node[:superclass] }" if node[:superclass]
+        case node.type
+        when :module
+          "module #{ node.name }"
+        when :class
+          code_class = "class #{ node.name }"
+          code_subclass = " < #{ node.superclass }" if node.superclass
           
           "#{code_class}#{code_subclass}"
-        elsif node[:include]
-          "include #{ node[:include] }"
-        elsif node[:extend]
-          "extend #{ node[:extend] }"
+        when :extend
+          "extend #{ node.name }"
+        when :include
+          "include #{ node.name }"
+        else
+          ""
+          # TODO: Raise ARST::Error::InvalidNodeType
         end
       end
       

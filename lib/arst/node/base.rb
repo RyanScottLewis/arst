@@ -1,3 +1,5 @@
+require 'arst/helpers'
+
 module ARST
   module Node
     
@@ -11,6 +13,10 @@ module ARST
         
         @parent, @children = options.values_at(:parent, :children)
         @children.collect! { |child_options| Node.from_options( child_options.merge(parent: self) ) }
+      end
+      
+      def type
+        @type ||= ARST::Helpers.underscore(self.class.to_s.split(/::/).last).to_sym
       end
       
       protected

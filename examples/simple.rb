@@ -15,7 +15,7 @@ begin
   
   # pry
   
-  options = { indent_char: "  ", indent_size: 1 }
+  options = { indent_char: '  ', indent_size: 1 }
   puts '', "OUTPUT - Ruby, single file, options=#{options}", ''
   output = ARST::Generator::Ruby.generate(tree, options)
   puts output

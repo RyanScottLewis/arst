@@ -1,21 +1,20 @@
 require 'arst/node/base'
+require 'arst/node/namable'
 
 module ARST
   module Node
     
     class Class < Base
       
-      attr_reader :name
+      include Namable
+      
+      attr_reader :superclass
       
       def initialize(options={})
         super(options)
         
         # TODO: Validate keys
-        self.name, self.superclass = options.values_at(:name, :superclass)
-      end
-      
-      def name=(name)
-        @name = name.to_s # TODO: Sanitize
+        self.superclass = options[:superclass]
       end
       
       def superclass=(superclass)
