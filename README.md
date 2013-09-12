@@ -4,8 +4,9 @@ Abstract Ruby Syntax Tree (ARST) is a high-level language syntax denoting the ob
 
 ARST can be used to generate:
 
-* Pure Ruby
+* Pure Ruby code
 * C Ruby extensions
+* Java Ruby extensions
 * Test::Unit, MiniTest::Unit, MiniTest::Spec, or RSpec tests
 * GraphViz graphs
 * Custom output
@@ -25,8 +26,8 @@ Integrations:
 Generators:
 
 * ARST::Generator::Ruby (baked in)
-* ARST::Generator::CRuby (baked in)
-* [ARST::Generator::JRuby](https://github.com/RyanScottLewis/arst-generator-jruby)
+* ARST::Generator::C (baked in)
+* [ARST::Generator::Java](https://github.com/RyanScottLewis/arst-generator-java)
 * [ARST::Generator::Test::Unit](https://github.com/RyanScottLewis/arst-generator-test-unit)
 * [ARST::Generator::MiniTest::Unit](https://github.com/RyanScottLewis/arst-generator-minitest-unit)
 * [ARST::Generator::MiniTest::Spec](https://github.com/RyanScottLewis/arst-generator-minitest-spec)
