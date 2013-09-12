@@ -9,6 +9,12 @@ module ARST
       new.parse(input)
     end
     
+    def parse(input)
+      tree = super(input)
+      
+      Node::Root.new(tree)
+    end
+    
     def indent(depth)
       str('  ' * depth)
     end

@@ -3,16 +3,18 @@ module ARST
     
     class Base
       
-      def self.generate(tree, options={})
-        new(tree).generate(options)
+      def self.generate(node, options={})
+        new(node).generate(options)
       end
       
-      def initialize(tree)
-        @tree = tree
+      attr_reader :node
+      
+      def initialize(node)
+        @node = node
       end
       
       def generate(options={})
-        parse_children(@tree, options)
+        parse_children(@node, options)
       end
       
       protected

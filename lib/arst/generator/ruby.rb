@@ -7,6 +7,8 @@ module ARST
       
       protected
       
+      # =-=-= Hooks =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      
       def default_options
         {
           depth:             0,
@@ -27,8 +29,6 @@ module ARST
         
         options[:newline_character] * options[:newline_size]
       end
-      
-      protected
       
       # =-=-= Parsers =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
       

@@ -2,6 +2,7 @@ require 'arst'
 
 require 'ap'
 require 'pp'
+require 'pry'
 
 begin
   puts '', 'INPUT', ''
@@ -12,14 +13,12 @@ begin
   tree = ARST::Parser.parse(input)
   ap tree
   
-  puts '', "TRANSFORMED", ''
-  output = ARST::Transformer.apply(tree)
-  ap output
+  # pry
   
-  # options = { indent_char: "  ", indent_size: 1 }
-  # puts '', "OUTPUT - Ruby, single file, options=#{options}", ''
-  # output = ARST::Generator::Ruby.generate(tree, options)
-  # puts output
+  options = { indent_char: "  ", indent_size: 1 }
+  puts '', "OUTPUT - Ruby, single file, options=#{options}", ''
+  output = ARST::Generator::Ruby.generate(tree, options)
+  puts output
   
 rescue ARST::Parser::ParseFailed => failure
   puts '', 'ERROR', ''

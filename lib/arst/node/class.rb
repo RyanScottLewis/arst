@@ -3,7 +3,7 @@ require 'arst/node/base'
 module ARST
   module Node
     
-    class Module < Base
+    class Class < Base
       
       attr_reader :name
       
@@ -11,11 +11,15 @@ module ARST
         super(options)
         
         # TODO: Validate keys
-        self.name = options[:name]
+        self.name, self.superclass = options.values_at(:name, :superclass)
       end
       
       def name=(name)
         @name = name.to_s # TODO: Sanitize
+      end
+      
+      def superclass=(superclass)
+        @superclass = superclass.to_s unless superclass.nil? # TODO: Sanitize
       end
       
     end

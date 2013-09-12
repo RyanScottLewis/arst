@@ -9,7 +9,8 @@ module ARST
         # TODO: Validate keys
         options = default_options.merge(options)
         
-        @children = options.values_at(:children)
+        @parent, @children = options.values_at(:parent, :children)
+        @children.collect! { |child_options| Node.from_options( child_options.merge(parent: self) ) }
       end
       
       protected
