@@ -15,10 +15,19 @@ begin
   
   # pry
   
-  options = { indent_char: '  ', indent_size: 1 }
-  puts '', "OUTPUT - Ruby, single file, options=#{options}", ''
+  # options = { indent_char: '  ', indent_size: 1, split_files: false }
+  # puts '', "OUTPUT - #{options}", ''
+  # output = ARST::Generator::Ruby.generate(tree, options)
+  # puts output[:filename]
+  # puts output[:body]
+  
+  options = { indent_char: '  ', indent_size: 1, split_files: true }
+  puts '', "OUTPUT - #{options}", ''
   output = ARST::Generator::Ruby.generate(tree, options)
-  puts output
+  output.each do |file|
+    puts "#{ file[:filename] } ------------------------------------------------", ''
+    puts file[:body], ''
+  end
   
 rescue ARST::Parser::ParseFailed => failure
   puts '', 'ERROR', ''

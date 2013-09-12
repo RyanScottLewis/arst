@@ -16,6 +16,10 @@ module ARST
         @name = name.to_s # TODO: Sanitize
       end
       
+      def human_name
+        ARST::Helpers.underscore(name)
+      end
+      
     end
     
   end

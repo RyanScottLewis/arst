@@ -5,7 +5,7 @@ module ARST
     
     class Base
       
-      attr_reader :children
+      attr_reader :parent, :children
       
       def initialize(options={})
         # TODO: Validate keys
@@ -13,6 +13,12 @@ module ARST
         
         @parent, @children = options.values_at(:parent, :children)
         @children.collect! { |child_options| Node.from_options( child_options.merge(parent: self) ) }
+      end
+      
+      def ancestors
+        return [] if parent.nil?
+        
+        ( parent.ancestors || [] ) + [self]
       end
       
       def type
