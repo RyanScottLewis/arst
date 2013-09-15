@@ -1,0 +1,5 @@
+require_relative '../lib/arst/rake_task'
+
+ARST::RakeTask.new do |t|
+  t.add_generator type: :ruby, input_path: 'simple.arst', output_path: 'simple'
+end

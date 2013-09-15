@@ -1,0 +1,14 @@
+module StupidModel
+  module Validations
+  module Callbacks
+  module Serialization
+    module ClassMethods
+    module InstanceMethods
+  class Base
+    extend Callbacks
+    include Validations
+    include Serialization
+module StupidRecord
+  module Persistence
+  class Base < StupidModel::Base
+    include Persistence
