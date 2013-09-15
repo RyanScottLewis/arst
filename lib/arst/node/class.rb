@@ -18,7 +18,12 @@ module ARST
       end
       
       def superclass=(superclass)
-        @superclass = superclass.to_s unless superclass.nil? # TODO: Sanitize
+        # TODO: Sanitize `superclass` given
+        @superclass = superclass.to_s unless superclass.nil?
+      end
+      
+      def superclass?
+        !superclass.nil?
       end
       
     end
