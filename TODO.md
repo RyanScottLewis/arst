@@ -4,7 +4,4 @@
     If found, generate the filename from that nodes ancestor tree (using `join` and `underscore`) and `require` that.
     If not, just `require` the `underscore`d node name
 * Generating C Ruby
-* Rake task
-  require 'rake/tasklib'
-  class ARST::RakeTask < Rake::TaskLib
-  end
+* Syntax checking
