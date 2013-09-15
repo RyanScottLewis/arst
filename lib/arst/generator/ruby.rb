@@ -1,4 +1,5 @@
 require 'arst/generator/base'
+require 'arst/helpers'
 
 module ARST
   module Generator
@@ -71,7 +72,11 @@ module ARST
         options[:ancestors] = node.ancestors # The main (first) node's ancestor list
         
         unless [:root, :include, :extend].include?(node.type) # TODO: Hold container (class, module) and non-container (include, extend) in helper method or constant
-          @current_output << { filename: filename_for_split_files(node), body: parse_node_for_multiple_files(node, options) }
+          body_code = parse_node_for_multiple_files(node, options)
+          body_requirements = require_statements_from_node(node)
+          body = "#{ body_requirements }#{ body_code }"
+          
+          @current_output << { filename: filename_for_split_files(node), body: body }
         end
         node.children.each { |child| parse_children_as_multiple_files(child, options) }
       end
@@ -121,7 +126,7 @@ module ARST
           "module #{ node.name }"
         when :class
           code_class = "class #{ node.name }"
-          code_subclass = " < #{ node.superclass }" if node.superclass
+          code_subclass = " < #{ node.superclass }" if node.superclass?
           
           "#{code_class}#{code_subclass}"
         when :extend
@@ -132,6 +137,25 @@ module ARST
           ""
           # TODO: Raise ARST::Error::InvalidNodeType
         end
+      end
+      
+      def require_statements_from_node(node)
+        # TODO: Determine scope of subclass or included/extended module
+        nodes_with_requirements = node.children.find_all do |child|
+          [:include, :extend].include?(child.type) || child.type == :class && child.superclass?
+        end
+        
+        nodes_with_requirements.unshift(node) if node.type == :class && node.superclass?
+        
+        nodes_with_requirements.collect! do |child|
+          name = child.type == :class ? child.superclass : child.name
+          ancestry = name.include?('::') ? name.split('::') : child.ancestors.collect(&:name)
+          path = ancestry.collect { |name| Helpers.underscore(name) }.join('/')
+          
+          "require '#{path}'"
+        end
+        
+        nodes_with_requirements.empty? ? nil : nodes_with_requirements.join("\n") << "\n\n"
       end
       
     end
