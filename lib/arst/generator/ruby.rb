@@ -19,7 +19,7 @@ module ARST
       def default_options
         {
           depth:             0,
-          split_files:       false,
+          split_files:       true,
           indent_size:       2,
           indent_char:       ' ',
           newline_size:      1,
@@ -46,7 +46,7 @@ module ARST
           @current_output = []
           parse_children_as_multiple_files(node, options)
         else
-          @current_output = { filename: filename_for_single_file(node), body: '' }
+          @current_output = [ { filename: filename_for_single_file(node), body: '' } ]
           
           parse_children_as_single_file(node, options)
         end
@@ -59,11 +59,11 @@ module ARST
       
       def parse_children_as_single_file(node, options={})
         node.children.each do |node|
-          @current_output[:body] << indent(options)      # TODO: DRY this up as a helper method
-          @current_output[:body] << code_from_node(node) # TODO: DRY this up as a helper method
-          @current_output[:body] << newline(options)     # TODO: DRY this up as a helper method
+          @current_output[0][:body] << indent(options)      # TODO: DRY this up as a helper method
+          @current_output[0][:body] << code_from_node(node) # TODO: DRY this up as a helper method
+          @current_output[0][:body] << newline(options)     # TODO: DRY this up as a helper method
           parse_children_as_single_file( node, options.merge(depth: options[:depth]+1) ) unless node.children.empty?
-          @current_output[:body] << "#{ indent(options) }end#{ newline(options) }" if [:module, :class].include?(node.type)
+          @current_output[0][:body] << "#{ indent(options) }end#{ newline(options) }" if [:module, :class].include?(node.type)
         end
       end
       
