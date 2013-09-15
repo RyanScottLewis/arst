@@ -4,6 +4,7 @@ module StupidModel
   module Serialization
     module ClassMethods
     module InstanceMethods
+  module OptionalMethods
   class Base
     extend Callbacks
     include Validations
@@ -12,3 +13,4 @@ module StupidRecord
   module Persistence
   class Base < StupidModel::Base
     include Persistence
+    include StupidModel::OptionalMethods
