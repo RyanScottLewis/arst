@@ -26,7 +26,9 @@ module ARST
     def define_tasks
       namespace :arst do
         desc 'Generate all ARST files'
-        task :generate { @generators.each { |options| generate(options) } }
+        task :generate do
+          @generators.each { |options| generate(options) }
+        end
       end
     end
     
