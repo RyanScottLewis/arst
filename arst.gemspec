@@ -11,13 +11,13 @@ Gem::Specification.new do |s|
   # Dependencies
   s.add_dependency 'active_support', '~> 3.0.0'
   s.add_dependency 'parslet',        '~> 1.5.0'
+  s.add_dependency 'rake',           '~> 10.0.0'
   s.add_dependency 'version',        '~> 1.0.0'
   # s.add_dependency 'polyglot',       '~> 0.3.0'
   s.add_development_dependency 'awesome_print', '~> 1.1.0'
   s.add_development_dependency 'cocaine',       '~> 0.5.0'
   s.add_development_dependency 'guard-bundler', '~> 1.0.0'
   s.add_development_dependency 'guard-shell',   '~> 0.5.0'
-  s.add_development_dependency 'rake',          '~> 10.0.0'
   s.add_development_dependency 'rb-fsevent',    '~> 0.9.0'
   
   # Pragmatically set variables
