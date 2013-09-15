@@ -8,6 +8,7 @@ module ARST
   
   module Node
     
+    # TODO: Rename to something more specific... from_raw_tree?
     def self.from_options(options)
       case options[:type]
       when 'module'  then Node::Module.new(options)
