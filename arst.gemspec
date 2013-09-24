@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.description   = s.summary
   s.name          = Pathname.new(__FILE__).basename('.gemspec').to_s
   s.require_paths = ['lib']
-  s.files         = Dir['{{Rake,Gem}file{.lock,},README*,VERSION,LICENSE,*.gemspec,{lib,bin,examples,spec,test}/**/*']
+  s.files         = Dir['{{Rake,Gem}file{.lock,},README*,VERSION,LICENSE,*.gemspec,{lib,bin,examples,spec,test}/**/*}']
   s.test_files    = Dir['{examples,spec,test}/**/*']
   
 end
