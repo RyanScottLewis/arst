@@ -61,7 +61,7 @@ module ARST
       def parse_children_as_single_file(node, options={})
         node.children.each do |node|
           @current_output[0][:body] << indent(options)      # TODO: DRY this up as a helper method
-          @current_output[0][:body] << code_from_node(node) # TODO: DRY this up as a helper method
+          @current_output[0][:body] << code_from_node(node, options) # TODO: DRY this up as a helper method
           @current_output[0][:body] << newline(options)     # TODO: DRY this up as a helper method
           parse_children_as_single_file( node, options.merge(depth: options[:depth]+1) ) unless node.children.empty?
           @current_output[0][:body] << "#{ indent(options) }end#{ newline(options) }" if [:module, :class].include?(node.type)
@@ -71,7 +71,7 @@ module ARST
       def parse_children_as_multiple_files(node, options={})
         options[:ancestors] = node.ancestors # The main (first) node's ancestor list
         
-        unless [:root, :include, :extend].include?(node.type) # TODO: Hold container (class, module) and non-container (include, extend) in helper method or constant
+        unless [:root, :include, :extend, :def].include?(node.type) # TODO: Hold container (class, module) and non-container (include, extend) in helper method or constant
           body_code = parse_node_for_multiple_files(node, options)
           body_requirements = require_statements_from_node(node)
           body = "#{ body_requirements }#{ body_code }"
@@ -87,16 +87,16 @@ module ARST
         ancestor = options[:ancestors][ options[:current_ancestor_index] ]
         
         output << indent(options)          # TODO: DRY this up as a helper method
-        output << code_from_node(ancestor) # TODO: DRY this up as a helper method
+        output << code_from_node(ancestor, options) # TODO: DRY this up as a helper method
         output << newline(options)         # TODO: DRY this up as a helper method
         
         if options[:current_ancestor_index] == options[:ancestors].count - 1 # The first node
           child_options = options.merge(depth: options[:depth]+1)
           
           ancestor.children.each do |child|
-            if [:include, :extend].include?(child.type) # TODO: Hold container (class, module) and non-container (include, extend) in helper method or constant
+            if [:root, :include, :extend, :def].include?(child.type) # TODO: Hold container (class, module) and non-container (include, extend) in helper method or constant
               output << indent(child_options)          # TODO: DRY this up as a helper method
-              output << code_from_node(child)          # TODO: DRY this up as a helper method
+              output << code_from_node(child, options)          # TODO: DRY this up as a helper method
               output << newline(child_options)         # TODO: DRY this up as a helper method
             end
           end
@@ -120,7 +120,7 @@ module ARST
         node.ancestors.collect(&:human_name).join('/') + '.rb'
       end
       
-      def code_from_node(node)
+      def code_from_node(node, options)
         case node.type
         when :module
           "module #{ node.name }"
@@ -133,6 +133,9 @@ module ARST
           "extend #{ node.name }"
         when :include
           "include #{ node.name }"
+        when :def
+          child_options = options.merge(depth: options[:depth] + 1)
+          "def #{ node.name }#{ node.arguments }#{ newline(child_options) }#{ indent(child_options) }end"
         else
           ""
           # TODO: Raise ARST::Error::InvalidNodeType
@@ -141,15 +144,14 @@ module ARST
       
       def require_statements_from_node(node)
         # TODO: Determine scope of subclass or included/extended module
-        nodes_with_requirements = node.children.find_all do |child|
-          [:include, :extend].include?(child.type) || child.type == :class && child.superclass?
+        nodes_to_check = [node] + node.children
+        nodes_with_requirements = nodes_to_check.find_all do |child|
+          [:include, :extend].include?(child.type) || child.type_is?(:class) && child.superclass?
         end
         
-        nodes_with_requirements.unshift(node) if node.type == :class && node.superclass?
-        
         nodes_with_requirements.collect! do |child|
-          name = child.type == :class ? child.superclass : child.name
-          ancestry = name.include?('::') ? name.split('::') : child.ancestors.collect(&:name)
+          constant = child.type_is?(:class) ? child.superclass : child.name
+          ancestry = constant.include?('::') ? constant.split('::') : child.ancestors.collect(&:name)
           path = ancestry.collect { |name| Helpers.underscore(name) }.join('/')
           
           "require '#{path}'"

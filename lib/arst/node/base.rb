@@ -25,6 +25,10 @@ module ARST
         @type ||= ARST::Helpers.underscore(self.class.to_s.split(/::/).last).to_sym
       end
       
+      def type_is?(type)
+        self.type == type
+      end
+      
       protected
       
       def default_options

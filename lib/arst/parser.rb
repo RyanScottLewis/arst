@@ -25,7 +25,11 @@ module ARST
     rule(:newline) { match('\n') }
     
     rule :constant do
-      match('[A-Z]') >> ( match('[A-Za-z0-9]') | str('::') ).repeat(1) # TODO: Cannot end with '::'
+      match('[A-Z]') >> ( match('[A-Za-z0-9_]') | str('::') ).repeat(1) # TODO: Cannot end with '::'
+    end
+    
+    rule :identifier do
+      match('[a-z_]') >> match('[A-Za-z0-9_]').repeat(1)
     end
     
     rule :module_keyword do
@@ -45,12 +49,20 @@ module ARST
       str('extend').as(:type) >> space >> constant.as(:name)
     end
     
+    # TODO: Should we have rules for arglists? See: http://kschiess.github.io/parslet/get-started.html
+    rule :def_keyword do
+      str('def').as(:type) >> space >> identifier.as(:name) >> spaces.maybe >>
+      (
+        str('(') >> match('[()\n]').absent? >> str(')')
+      ).as(:arguments).maybe
+    end
+    
     def node(depth)
       indent(depth) >> 
       (
         ( class_keyword | module_keyword ) >> newline.maybe >>
-        dynamic { |soutce, context| node(depth+1).repeat(0) }.as(:children) |
-        ( include_keyword | extend_keyword ) >> newline.maybe |
+        dynamic { |source, context| node(depth+1).repeat(0) }.as(:children) |
+        ( include_keyword | extend_keyword | def_keyword ) >> newline.maybe |
         newline
       )
     end 

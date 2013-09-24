@@ -3,6 +3,7 @@ require 'arst/node/module'
 require 'arst/node/class'
 require 'arst/node/include'
 require 'arst/node/extend'
+require 'arst/node/def'
 
 module ARST
   
@@ -15,6 +16,7 @@ module ARST
       when 'class'   then Node::Class.new(options)
       when 'extend'  then Node::Extend.new(options)
       when 'include' then Node::Include.new(options)
+      when 'def'     then Node::Def.new(options)
       else
         # TODO: Raise ARST::Error::InvalidNodeType
       end
