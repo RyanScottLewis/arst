@@ -181,14 +181,14 @@ Let's refactor our Rake task:
 require 'arst/rake_task'
 
 ARST::RakeTask.new do |t|
-  t.generate(:ruby, input_path: 'stupid_record.arst')
+  t.add_generator type: :ruby, input_path: 'stupid_record.arst', output_path: 'stupid_record/lib'
 end
 ```
 
 > Note: The `:split_files` option is `true` and the `output_path` option is `'lib'` by default in the Ruby generator.  
 > Each generator has it's own set of options.
 
-Now, when we run the `rake arst:ruby` task to generate our code, the project is bootstrapped in a more conventional manner:
+Now, when we run the `rake arst:generate` task to generate our code, the project is bootstrapped in a more conventional manner:
 
 `lib/stupid_model.rb`
 
