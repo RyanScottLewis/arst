@@ -55,6 +55,8 @@ module ARST
           puts "[EXISTS] #{file_path}"
         end
       end
+    rescue Parslet::ParseFailed => error
+      puts error.cause.ascii_tree # TODO: DEBUG option or something
     end
     
   end
