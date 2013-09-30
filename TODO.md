@@ -3,4 +3,4 @@
 * Generating C Ruby
 * Syntax checking
 * Parsing blank lines
-* Option to change the "indentation step" for ARST files
+* Option to change the "indentation step" for ARST files.. or even auto detect from the first indentation
