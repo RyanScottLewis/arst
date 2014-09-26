@@ -1,4 +1,7 @@
-require_relative '../lib/arst/rake_task'
+require 'pathname'
+$:.unshift( Pathname.new(__FILE__).join('..', '..', 'lib').expand_path.to_s )
+
+require 'arst/rake_task'
 
 ARST::RakeTask.new do |t|
   t.add_generator type: :ruby, input_path: 'methods.arst', output_path: 'methods'

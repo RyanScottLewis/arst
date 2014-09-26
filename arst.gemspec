@@ -9,15 +9,15 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
   
   # Dependencies
-  s.add_dependency 'active_support', '~> 3.0.0'
-  s.add_dependency 'parslet',        '~> 1.5.0'
-  s.add_dependency 'rake',           '~> 10.0.0'
+  # s.add_dependency 'active_support', '~> 3.0.0'
+  s.add_dependency 'parslet',        '~> 1.6.1'
+  s.add_dependency 'rake',           '~> 10.0.0' # TODO: What should this depend on? What version of Rake DOESN'T have TaskLib? Should the development version of Rake be different?
   s.add_dependency 'version',        '~> 1.0.0'
   # s.add_dependency 'polyglot',       '~> 0.3.0'
-  s.add_development_dependency 'awesome_print', '~> 1.1.0'
-  s.add_development_dependency 'cocaine',       '~> 0.5.0'
-  s.add_development_dependency 'guard-bundler', '~> 1.0.0'
-  s.add_development_dependency 'guard-shell',   '~> 0.5.0'
+  s.add_development_dependency 'rspec',         '~> 3.1.0'
+  s.add_development_dependency 'guard-rspec',   '~> 4.3.1'
+  s.add_development_dependency 'guard-shell',   '~> 0.6.1'
+  s.add_development_dependency 'guard-yard',    '~> 2.1.1'
   s.add_development_dependency 'rb-fsevent',    '~> 0.9.0'
   
   # Pragmatically set variables

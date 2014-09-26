@@ -4,9 +4,8 @@ require 'arst'
 
 module ARST
   
+  # The Rake task for defining ARST generator tasks.
   class RakeTask < Rake::TaskLib
-    
-    attr_reader :generators
     
     def initialize(&block)
       @generators = []
@@ -15,6 +14,11 @@ module ARST
       
       define_tasks
     end
+    
+    # Get the list of generators defined.
+    # 
+    # @return [Array<ARST::Generator>]
+    attr_reader :generators
     
     def add_generator(generator_options={})
       # TODO: Validate generator_options
