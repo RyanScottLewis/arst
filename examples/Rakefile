@@ -1,10 +1,10 @@
-require 'pathname'
-$:.unshift( Pathname.new(__FILE__).join('..', '..', 'lib').expand_path.to_s )
+require "pathname"
+$LOAD_PATH.unshift(Pathname.new(__FILE__).join("..", "..", "lib").expand_path.to_s)
 
-require 'arst/rake_task'
+require "arst/rake_task"
 
 ARST::RakeTask.new do |t|
-  t.add_generator type: :ruby, input_path: 'methods.arst', output_path: 'methods'
-  t.add_generator type: :ruby, input_path: 'simple.arst', output_path: 'simple'
-  t.add_generator type: :ruby, input_path: 'game.arst', output_path: 'game'
+  t.add_generator type: :ruby, input_path: "methods.arst", output_path: "methods"
+  t.add_generator type: :ruby, input_path: "simple.arst", output_path: "simple"
+  t.add_generator type: :ruby, input_path: "game.arst", output_path: "game"
 end

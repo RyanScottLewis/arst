@@ -1,0 +1,8 @@
+module SomeLibrary
+  def do_things
+  def do_another_thing()
+  def do_something_crazy(options={})
+  def do_something_else( options = {} )
+  def do_a_thing12(     )
+  def do_something_15_times
+  def do_SomethingDifferent( this, that, omg    = { lol: 'wtf'} )
