@@ -2,23 +2,19 @@
 
 ARST is a language syntax denoting the object domain model of a Ruby project and a polyglot source code generator.
 
+## Basics
+
 ARST files can be used to generate:
 
-* Pure Ruby code  
-* * To quickly generate source files for gems or projects.  
-* * To map out the domain model of the objects for new or proposed projects.
+* Ruby code
 * Tests
-* * Bootstrap RSpec, Test::Unit, MiniTest::Unit, or MiniTest::Spec files based on your current codebase.
 * Ruby extensions
-* * Bootstrap C, Java, or MRuby specific code.
 * GraphViz graphs
-* * Map out the domain model of your project.
 * Custom output
-* * Create your own generators.
 
 ARST files can also be generated which allows all of the above an already existing projects.
 
-Integrations:
+### Integrations
 
 * Rake (baked in)
 * * Rake commands to generate files based on an ARST file or generate an ARST files based on project files.
@@ -28,7 +24,7 @@ Integrations:
 * [Rails](https://github.com/RyanScottLewis/arst-rails)
 * * Generate ARST files from Rails projects.
 
-Generators:
+### Generators
 
 * ARST::Generator::Ruby (baked in)
 * ARST::Generator::C (baked in)
@@ -65,13 +61,14 @@ This means that most syntax highlighters for Ruby will also work for ARST.
 * `def instance_method(arg1, *other_args)` (and anything else accepted method arguments in Ruby's syntax)
 * `def self.class_method(arg1, opts={})` (and anything else accepted method arguments in Ruby's syntax)
 * `alias` and `alias_method`
-* `alias_module` which generate `NewClassName = OldClassName`
+* `attr`, `attr_reader`, `attr_writer`, `attr_accessor`
+* `class << self`
 
 ### Indentation
 
 ARST is an indentation-sensitive syntax meaning that the following are **not** equivalent:
 
-<table width="100%"><tr><td>
+<table style="width:100%"><tr><td>
 <pre>
 module Foo
   module Bar
@@ -101,32 +98,34 @@ This allows it to be loose in regards to how it interprets indentation:
 
 Below is an example of oddly indented (but still valid) ARST code.
 
-<table width="100%" markdown="1"><tr markdown="1"><td markdown="1">
+<table width="100%">
+<tr>
+<td><b>ARST</b></td>
+<td><b>Parsed Tree</b></td>
+<tr><td>
+<pre>
+module Foo
+  class Bar
+       def self.a
+         attr_reader :b
+           module Zed
+    module Qux
+  module Baz
+</pre>
+</td><td>
+<pre>
+module Foo
+|- class Bar
+|  |- def self.a
+|  |- attr_reader :b
+|  |- module Zed
+|  |- module Qux
+|- module Baz
+</pre>
+</td></tr>
+</table>
 
-**ARST**
-
-    module Foo
-      class Bar
-           def self.a
-             attr_reader :b
-               module Zed
-        module Qux
-      module Baz
-
-</td><td markdown="1">
-
-**Parsed Indentation**
-
-    module Foo
-    |- class Bar
-    |  |- def self.a
-    |  |- attr_reader :b
-    |  |- module Zed
-    |- class Baz
-
-</td></tr></table>
-
-It's very recommended to maintain consistant indentation throughout the document:
+It's very recommended to maintain consistent indentation throughout the document:
 
     module Foo
       class Bar
@@ -142,7 +141,8 @@ It's very recommended to maintain consistant indentation throughout the document
 
 The first step is to create an ARST file within your project. There is no convention as to where to place or name this file.
 
-For projects, I tend to use a single `.arst` in the root directory of the project.  
+For projects, I tend to use a single `.arst` file in the root directory of the project.
+
 When maintaining a projects with multiple subprojects, I'll use `project_one.arst` and `project_two.arst` in the directory containing those
 project directories.
 
@@ -152,7 +152,9 @@ project directories.
 module StupidModel
   module Validations
   module Callbacks
+    def self.all
   module Serialization
+    extend ClassMethods
     module ClassMethods
   class Base
     extend Callbacks
@@ -169,18 +171,19 @@ module StupidRecord
 `Rakefile`
 
 ```rb
-require 'arst/rake_task'
+require 'arst/rake/task'
 
-ARST::RakeTask.new do |t|
+ARST::Rake::Task.new do |t|
   # Define a generate task
   t.generate(name: :stupid_model, generator: :ruby, input_path: 'stupid_record.arst', output_path: 'lib')
 end
 ```
 
-By default, the name of the task defined is the same as the generator, but in the example above, we named ours `:stupid_model`.  
-This defines the `arst:stupid_model` Rake task.
+By default, the name of the task defined is the same as the `input_path` without it's file extension, but in the example above, we named ours `:stupid_model`.
 
-`:input_path` and `:output_path` are options on the ARST::Generator::Ruby class.  
+This defines the `arst` and `arst:stupid_model` Rake tasks.  
+Running the `arst` task will run all generators and running `arst:stupid_model` will only run the "stupid_model" generator.
+
 Each generator has it's own set of options and defaults.
 
 ### Generate your code
@@ -212,6 +215,8 @@ end
 ```rb
 module StupidModel
   module Callbacks
+    def self.all
+    end
   end
 end
 ```
@@ -220,10 +225,10 @@ end
 
 ```rb
 require 'stupid_model/serialization/class_methods'
-require 'stupid_model/serialization/instance_methods'
 
 module StupidModel
   module Serialization
+    extend ClassMethods
   end
 end
 ```
@@ -234,17 +239,6 @@ end
 module StupidModel
   module Serialization
     module ClassMethods
-    end
-  end
-end
-```
-
-`lib/stupid_model/serialization/instance_methods.rb`
-
-```rb
-module StupidModel
-  module Serialization
-    module InstanceMethods
     end
   end
 end
@@ -269,8 +263,6 @@ end
 `lib/stupid_record.rb`
 
 ```rb
-require 'stupid_record/base'
-
 module StupidRecord
 end
 ```
@@ -297,7 +289,8 @@ module StupidRecord
 end
 ```
 
-Now we're saving some typing!  
+Now we're saving some typing!
+
 This may not be exactly the code you were looking to generate, but it's close enough to start working quickly.
 
 > Warning: When we generate the files, they are OVERWRITTEN. Meaning you WILL LOSE CODE if the file already exists.  
@@ -315,7 +308,7 @@ A require call will be added when:
 
 ## How It Works
 
-ARST works by parsing ARST Notation or transforming a Ruby AST of a file or project into an "Abstract Ruby Syntax Tree" which is a 
+ARST works by parsing ARST Notation or transforming a Ruby AST of a file or project into an "Abstract Ruby Syntax Tree" which is a
 minimal version of the Ruby AST. With this ARST, we can generate/modify Ruby or ARST files based on this tree.
 
 ### ARST Notation
