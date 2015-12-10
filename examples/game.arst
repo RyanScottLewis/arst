@@ -1,0 +1,52 @@
+# The basics of a simple game system.
+module Game
+  module Graphics
+    class Window
+      class << self
+        # Get the list of all windows.
+        def all
+        # Find a window by the given attributes.
+        def find
+      def initialize(attributes={})
+      # Get the id of this window.
+      attr_reader :id
+      # Get the title of this window.
+      attr_reader :title
+      # Set the title of this window.
+      def title=(value)
+      # Get all entites in this window.
+      attr_reader :entities
+  module Audio
+    class Sound # A single sound.
+      def initialize(filename)
+      def loop=(value) # Set whether this sound will loop.
+      def play # Play this sound
+  module Updatable
+    def update # Update this object.
+  module Renderable
+    def render # Render this object.
+  module Positionable
+    # Get the x coordinate of this object.
+    attr_reader :x
+    # Set the x coordinate of this object.
+    def x=(value)
+    # Get the y coordinate of this object.
+    attr_reader :y
+    # Set the y coordinate of this object.
+    def y=(value)
+  class Entity # The base class for all entities
+    include Updatable
+    include Renderable
+    include Positionable
+  class Point < Entity
+    def draw
+  class Line < Entity
+    def draw
+  class Polygon < Entity
+    attr_reader :points # Get the list of points which make up the vertices of this polygon.
+    def filled? # Get whether this polygon will be filled when drawn.
+    def draw
+  class Rectangle < Polygon
+    def initialize(attributes={})
+  class Triangle < Polygon
+    def initialize(attributes={})

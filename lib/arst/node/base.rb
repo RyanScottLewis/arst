@@ -1,43 +1,27 @@
-require 'arst/helpers'
-
 module ARST
   module Node
-    
+    # The base class for nodes within the syntax tree.
     class Base
-      
-      attr_reader :parent, :children
-      
-      def initialize(options={})
-        # TODO: Validate keys
-        options = default_options.merge(options)
-        
-        @parent, @children = options.values_at(:parent, :children)
-        @children.collect! { |child_options| Node.from_options( child_options.merge(parent: self) ) }
+      class << self
+        # Get the type name for this node.
+        def type
+          to_s.split(/::/).last.to_sym
+        end
       end
-      
-      def ancestors
-        return [] if parent.nil?
-        
-        ( parent.ancestors || [] ) + [self]
+
+      def initialize(attributes={})
+        update_attributes(attributes)
       end
-      
-      def type
-        @type ||= ARST::Helpers.underscore(self.class.to_s.split(/::/).last).to_sym
+
+      # Update the attributes on this node.
+      def update_attributes(attributes={})
+        return if attributes.nil?
+
+        raise TypeError, 'attributes must respond to #to_hash or #to_h' unless attributes.respond_to?(:to_hash) || attributes.respond_to?(:to_h)
+        attributes = attributes.to_hash rescue attributes.to_h
+
+        attributes.each { |name, value| send("#{name}=", value) }
       end
-      
-      def type_is?(type)
-        self.type == type
-      end
-      
-      protected
-      
-      def default_options
-        {
-          children: []
-        }
-      end
-      
     end
-    
   end
 end
