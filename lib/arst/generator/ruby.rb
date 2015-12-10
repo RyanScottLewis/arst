@@ -43,6 +43,7 @@ module ARST
 
         if options[:split_files]
           @current_output = []
+
           parse_children_as_multiple_files(node, options)
         else
           @current_output = [{ filename: filename_for_single_file(node), body: "" }]
