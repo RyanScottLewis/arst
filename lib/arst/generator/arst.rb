@@ -1,29 +1,37 @@
 require "arst/generator/base"
+require "arst/node"
 
 module ARST
   module Generator
+    # The ARST Syntax generator.
     class ARST < Base
       protected
 
+      def default_options
+        {
+          depth:       0,
+          split_files: true,
+          indent_size: 2,
+          indent_char: " "
+        }
+      end
+
       def parse_children(node, options={})
+        options = default_options.merge(options.to_h)
         output = ""
 
-        node[:children].each do |node|
+        node.children.each do |node|
           output << (options[:indent_char] * options[:indent_size]) * options[:depth]
 
-          if node[:module]
-            output << "module #{node[:module]}"
-          elsif node[:class]
-            output << "class #{node[:class]}"
-            output << " < #{node[:superclass]}" if node[:superclass]
-          elsif node[:include]
-            output << "include #{node[:include]}"
-          elsif node[:extend]
-            output << "extend #{node[:extend]}"
+          output << case node
+            when Node::ModuleKeyword then "module #{node.name}"
+            when Node::ClassKeyword then "class #{node.name}#{" < #{node.superclass}" if node.superclass?}"
+            when Node::IncludeKeyword then "include #{node.name}"
+            when Node::ExtendKeyword then "extend #{node.name}"
           end
 
           output << "\n"
-          output << parse_children(node, options.merge(depth: options[:depth] + 1)) if node.key?(:children)
+          output << parse_children(node, options.merge(depth: options[:depth] + 1)) if node.respond_to?(:children)
         end
 
         output

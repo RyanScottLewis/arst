@@ -17,10 +17,24 @@ module ARST
       def update_attributes(attributes={})
         return if attributes.nil?
 
-        raise TypeError, 'attributes must respond to #to_hash or #to_h' unless attributes.respond_to?(:to_hash) || attributes.respond_to?(:to_h)
-        attributes = attributes.to_hash rescue attributes.to_h
-
+        attributes = attributes.to_h
         attributes.each { |name, value| send("#{name}=", value) }
+
+        attributes
+      end
+
+      # Get the parent of this node.
+      #
+      # @return [nil, Node::Base]
+      attr_reader :parent
+
+      # Get the parent of this node.
+      #
+      # @return [nil, Node::Base]
+      def parent=(value)
+        raise TypeError unless value.nil? || value.is_a?(Node::Base) # TODO: Error::Node::InvalidNode ?
+
+        @parent = value
       end
     end
   end

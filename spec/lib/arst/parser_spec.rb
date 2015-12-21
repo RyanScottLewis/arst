@@ -96,7 +96,7 @@ describe ARST::Parser do
     end
   end
 
-  describe '#module_keyword' do
+  describe '#class_keyword' do
     subject { described_class.new.class_keyword }
 
     it "should parse correctly" do

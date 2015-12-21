@@ -7,7 +7,6 @@ module ARST
     # A generator defined within the rake task
     class DefinedGenerator
       def initialize(options)
-        options = validate_options(options)
         initialize_attributes(options)
       end
 
@@ -23,8 +22,8 @@ module ARST
         # TODO: Check if input_path is a valid ARST file
         # TODO: Check if output_path is a directory if split_files == true
 
-        tree = ARST::Parser.parse(@input_path.read)
-        output = ARST::Generator.generate(@type, tree, options)
+        node = ARST::Parser.parse(@input_path.read)
+        output = ARST::Generator.generate(@type, node, @options)
 
         write_files_from_generator_output(output)
 
@@ -35,40 +34,35 @@ module ARST
 
       protected
 
-      def validate_options(options)
-        options = options.to_h
-
-        options[:input_path] = options[:input_path].to_s.strip
-        options[:output_path] = options[:output_path].to_s.strip
-        options[:name] = options[:name].to_sym unless options[:name].nil?
-        options[:type] = options[:type].to_sym unless options[:name].nil?
-
-        raise ArgumentError, "invalid :input_path option" if options[:input_path].nil?
-        raise ArgumentError, "invalid :output_path option" if options[:output_path].nil?
-
-        options
-      end
-
       def initialize_attributes(options)
-        @input_path = Pathname.new(options[:input_path])
-        @output_path = Pathname.new(options[:output_path])
-        @name = options[:name]
-        @type = options[:type]
+        @options = options.to_h
+
+        @input_path = @options.delete(:input_path).to_s.strip
+        @output_path = @options.delete(:output_path).to_s.strip
+
+        raise ArgumentError, "invalid :input_path option" if @input_path.empty?
+        raise ArgumentError, "invalid :output_path option" if @output_path.empty?
+
+        @input_path = Pathname.new(@input_path)
+        @output_path = Pathname.new(@output_path)
+
+        @name = @options.delete(:name).to_sym unless @options[:name].nil?
+        @type = @options.delete(:type).to_sym unless @options[:type].nil?
 
         @name ||= @input_path.basename(@input_path.extname).to_s # TODO: For tests: if "foo.arst" then "foo", if ".arst" then return ".arst". Works now but test anyways
         @type ||= :ruby
       end
 
       def write_files_from_generator_output(output)
-        output.each do |data|
-          file_path = output_path.join(data[:filename])
+        output.each do |output_file|
+          file_path = @output_path.join(output_file[:filename])
           file_path.dirname.mkpath
 
           if file_path.exist?
             puts "[EXISTS] #{file_path}"
           else
             puts "[GENERATE] #{file_path}"
-            file_path.open("w+") { |file| file.write(data[:body]) }
+            file_path.open("w+") { |file| file.write(output_file[:body]) }
           end
         end
       end

@@ -20,47 +20,32 @@ module ARST
     # @return [Node::Root] ARST.
     def parse(input)
       root_node = Node::Root.new
-      current_scope = { indentation: 0, node: root_node }
+      @current_scope = { depth: 0, node: root_node }
 
-      input.lines.each do |line|
-        line_tree = super(line)
+      lines = input.lines.collect { |line| super(line) }
+      lines = sanitize_lines(lines)
+      transform_lines(lines)
 
-        next unless line_tree.is_a?(Hash)
+      @current_scope = nil
 
-        case line_tree[:type].to_s
-          when "module"
-            indentation = line_tree[:indentation].is_a?(Array) ? 0 : line_tree[:indentation].to_s.length
-            node = Node::ModuleKeyword.new(name: line_tree[:name])
+    # TODO: !!!!!!!!!!!!!!!!!!!
+    # TODO: Classes do not show up in the tree oh nooooo oh fuck aw geez
+    # TODO: !!!!!!!!!!!!!!!!!!!
 
-            # TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            # TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            # TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            # TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            # if indentation < current_scope.indentation
-            #   if indentation < current_scope.parent.indentation
-            # else
-            #
-            # end
+      require "arst/generator/arst"
+      puts input
+      puts ?! * 80
+      puts ?! * 80
+      puts Generator::ARST.generate(root_node)
 
-            current_scope.children << node
-            current_scope = node
-          when "class"
-            indentation = line_tree[:indentation].is_a?(Array) ? 0 : line_tree[:indentation].to_s.length
-            node = Node::ClassKeyword.new(name: line_tree[:name], indentation: indentation)
-
-            current_scope.children << node
-            current_scope = node
-          when "include" then current_scope.children << Node::IncludeKeyword.new(name: line_tree[:name])
-          when "extend " then current_scope.children << Node::ExtendKeyword.new(name: line_tree[:name])
-          when "def"     then current_scope.children << Node::DefKeyword.new(name: line_tree[:name], arguments: line_tree[:arguments])
-        end
-      end
 
       root_node
     end
 
-    rule(:space)   { match('[\t\s]') }
-    rule(:spaces)  { space.repeat(1) }
+    rule(:space) { match('\s') }
+
+    rule(:spaces) { space.repeat(1) }
+
     rule(:spaces?) { spaces.maybe }
 
     rule(:constant) { match("[A-Z]") >> match("[A-Za-z0-9_]").repeat }
@@ -77,20 +62,60 @@ module ARST
 
     rule(:extend_keyword) { str("extend").as(:type) >> spaces >> namespace.as(:name) }
 
-    # TODO: Should we have rules for arglists? See: http://kschiess.github.io/parslet/get-started.html
-    rule :def_keyword do
-      str("def").as(:type) >> space >> identifier.as(:name) >> spaces.maybe >>
-        (
-          # str('(') >> match('[()\n]').absent?.maybe >> str(')')
-          # str('(') >> (match('[)\n]').absent? >> any).repeat >> str(')')
-          str("(") >> (str(")").absent? >> any).repeat >> str(")")
-        ).as(:arguments).maybe
-    end
+    rule(:def_keyword) { str("def").as(:type) >> space >> identifier.as(:name) >> spaces.maybe >> (str("(") >> (str(")").absent? >> any).repeat >> str(")")).as(:arguments).maybe } # TODO: Should we have rules for arglists? See: http://kschiess.github.io/parslet/get-started.html
 
     rule(:keyword) { module_keyword | class_keyword | include_keyword | extend_keyword | def_keyword }
 
-    rule(:document) { space.repeat(0).as(:indentation) >> keyword.maybe >> spaces? }
+    rule(:line) { space.repeat(0).as(:indentation) >> keyword.maybe >> spaces? }
 
-    root :document
+    root(:line)
+
+    protected
+
+    def sanitize_lines(lines)
+      lines.each_with_object([]) do |line, memo|
+        next unless line.is_a?(Hash)
+
+        line[:indentation] = line[:indentation].is_a?(Array) ? 0 : line[:indentation].to_s.length
+        line[:indentation] -= 1 if line[:indentation].odd? # Quantize indentation to 2 spaces if needed
+        line[:indentation] /= 2 # Convert space count to indentation depth
+
+        # line[:indentation] = @current_scope[:depth] + 2 if line[:indentation] > @current_scope[:depth] + 2
+
+        line[:type] = line[:type].to_sym
+
+        memo << line
+      end
+    end
+
+    def transform_lines(lines)
+      lines.each do |line|
+        depth = line.delete(:indentation)
+
+        if depth > @current_scope[:depth]
+          # @current_scope[:depth] += 1
+          @current_scope[:node] = @current_scope[:node].children.reverse.find { |child| [Node::ModuleKeyword, Node::ClassKeyword].include?(child.class) }
+        elsif depth < @current_scope[:depth]
+          # @current_scope[:depth] -= 1
+          @current_scope[:node] = @current_scope[:node].parent
+        end
+
+        case line[:type]
+          when :module  then parse_module_or_class_keyword(line, depth)
+          when :class   then parse_module_or_class_keyword(line, depth)
+          when :include then @current_scope[:node].add_child(Node::IncludeKeyword.new(line))
+          when :extend  then @current_scope[:node].add_child(Node::ExtendKeyword.new(line))
+          when :def     then @current_scope[:node].add_child(Node::DefKeyword.new(line))
+        end
+      end
+    end
+
+    def parse_module_or_class_keyword(line, depth)
+      node_class = { module: Node::ModuleKeyword, class: Node::ClassKeyword }[line[:type]]
+      node = node_class.new(line)
+
+      @current_scope[:depth] = depth
+      @current_scope[:node].add_child(node)
+    end
   end
 end

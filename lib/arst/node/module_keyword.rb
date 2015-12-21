@@ -1,8 +1,11 @@
-require "arst/node/scoped_keyword"
+require "arst/node/has_children"
+require "arst/node/keyword"
 
 module ARST
   module Node
-    class ModuleKeyword < ScopedKeyword
+    # The node for the `module` keyword.
+    class ModuleKeyword < Keyword
+      include HasChildren
     end
   end
 end

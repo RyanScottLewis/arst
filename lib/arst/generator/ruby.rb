@@ -33,13 +33,13 @@ module ARST
       def newline(options)
         newline_char = options[:newline_size] == 0 ? "; " : options[:newline_character]
 
-        options[:newline_character] * options[:newline_size]
+        newline_char * options[:newline_size]
       end
 
       # =-=-= Parsers =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
       def parse_children(node, options={})
-        options = default_options.merge(options)
+        options = default_options.merge(options.to_h)
 
         if options[:split_files]
           @current_output = []
@@ -58,12 +58,14 @@ module ARST
       end
 
       def parse_children_as_single_file(node, options={})
-        node.children.each do |node|
+        return unless node.respond_to?(:children)
+
+        node.children.each do |child|
           @current_output[0][:body] << indent(options) # TODO: DRY this up as a helper method
-          @current_output[0][:body] << code_from_node(node, options) # TODO: DRY this up as a helper method
+          @current_output[0][:body] << code_from_node(child, options) # TODO: DRY this up as a helper method
           @current_output[0][:body] << newline(options) # TODO: DRY this up as a helper method
-          parse_children_as_single_file(node, options.merge(depth: options[:depth] + 1)) unless node.children.empty?
-          @current_output[0][:body] << "#{indent(options)}end#{newline(options)}" if [:module, :class].include?(node.type)
+          parse_children_as_single_file(child, options.merge(depth: options[:depth] + 1)) unless child.respond_to?(:children) && child.children.empty?
+          @current_output[0][:body] << "#{indent(options)}end#{newline(options)}" if [:module, :class].include?(child.type)
         end
       end
 
@@ -120,23 +122,16 @@ module ARST
 
       def code_from_node(node, options)
         case node.type
-          when :module
-            "module #{node.name}"
-          when :class
-            code_class = "class #{node.name}"
-            code_subclass = " < #{node.superclass}" if node.superclass?
-
-            "#{code_class}#{code_subclass}"
-          when :extend
-            "extend #{node.name}"
-          when :include
-            "include #{node.name}"
+          when :module  then "module #{node.name}"
+          when :class   then "class #{node.name}#{" < #{node.name}" if node.superclass?}"
+          when :extend  then "extend #{node.name}"
+          when :include then "include #{node.name}"
           when :def
             child_options = options.merge(depth: options[:depth] + 1)
+
             "def #{node.name}#{node.arguments}#{newline(child_options)}#{indent(child_options)}end"
           else
-            ""
-          # TODO: Raise ARST::Error::InvalidNodeType
+            "" # TODO: Raise ARST::Error::InvalidNodeType
         end
       end
 
