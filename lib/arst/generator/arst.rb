@@ -20,18 +20,18 @@ module ARST
         options = default_options.merge(options.to_h)
         output = ""
 
-        node.children.each do |node|
+        node.children.each do |child|
           output << (options[:indent_char] * options[:indent_size]) * options[:depth]
 
-          output << case node
-            when Node::ModuleKeyword then "module #{node.name}"
-            when Node::ClassKeyword then "class #{node.name}#{" < #{node.superclass}" if node.superclass?}"
-            when Node::IncludeKeyword then "include #{node.name}"
-            when Node::ExtendKeyword then "extend #{node.name}"
+          output << case child
+            when Node::ModuleKeyword then "module #{child.name}"
+            when Node::ClassKeyword then "class #{child.name}#{" < #{child.superclass}" if child.superclass?}"
+            when Node::IncludeKeyword then "include #{child.name}"
+            when Node::ExtendKeyword then "extend #{child.name}"
           end
 
           output << "\n"
-          output << parse_children(node, options.merge(depth: options[:depth] + 1)) if node.respond_to?(:children)
+          output << parse_children(child, options.merge(depth: options[:depth] + 1)) if child.respond_to?(:children)
         end
 
         output

@@ -123,7 +123,7 @@ module ARST
       def code_from_node(node, options)
         case node.type
           when :module  then "module #{node.name}"
-          when :class   then "class #{node.name}#{" < #{node.name}" if node.superclass?}"
+          when :class   then "class #{node.name}#{" < #{node.superclass}" if node.superclass?}"
           when :extend  then "extend #{node.name}"
           when :include then "include #{node.name}"
           when :def

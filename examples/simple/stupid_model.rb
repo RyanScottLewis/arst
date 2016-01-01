@@ -19,7 +19,7 @@ module StupidModel
   module StupidRecord
     module Persistence
     end
-    class Base < Base
+    class Base < StupidModel::Base
       include Persistence
       include StupidModel::OptionalMethods
     end

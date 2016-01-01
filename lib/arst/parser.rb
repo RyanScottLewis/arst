@@ -28,17 +28,6 @@ module ARST
 
       @current_scope = nil
 
-    # TODO: !!!!!!!!!!!!!!!!!!!
-    # TODO: Classes do not show up in the tree oh nooooo oh fuck aw geez
-    # TODO: !!!!!!!!!!!!!!!!!!!
-
-      require "arst/generator/arst"
-      puts input
-      puts ?! * 80
-      puts ?! * 80
-      puts Generator::ARST.generate(root_node)
-
-
       root_node
     end
 
@@ -80,7 +69,7 @@ module ARST
         line[:indentation] -= 1 if line[:indentation].odd? # Quantize indentation to 2 spaces if needed
         line[:indentation] /= 2 # Convert space count to indentation depth
 
-        # line[:indentation] = @current_scope[:depth] + 2 if line[:indentation] > @current_scope[:depth] + 2
+        # line[:indentation] = @current_scope[:depth] + 2 if line[:indentation] > @current_scope[:depth] + 2 # TODO
 
         line[:type] = line[:type].to_sym
 
@@ -93,10 +82,10 @@ module ARST
         depth = line.delete(:indentation)
 
         if depth > @current_scope[:depth]
-          # @current_scope[:depth] += 1
-          @current_scope[:node] = @current_scope[:node].children.reverse.find { |child| [Node::ModuleKeyword, Node::ClassKeyword].include?(child.class) }
+          next_scoped_keyword_child = @current_scope[:node].children.reverse.find { |child| child.respond_to?(:children) }
+
+          @current_scope[:node] = next_scoped_keyword_child unless next_scoped_keyword_child.nil?
         elsif depth < @current_scope[:depth]
-          # @current_scope[:depth] -= 1
           @current_scope[:node] = @current_scope[:node].parent
         end
 
