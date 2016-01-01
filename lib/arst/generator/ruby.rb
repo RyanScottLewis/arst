@@ -79,7 +79,8 @@ module ARST
 
           @current_output << { filename: filename_for_split_files(node), body: body }
         end
-        node.children.each { |child| parse_children_as_multiple_files(child, options) }
+
+        node.children.each { |child| parse_children_as_multiple_files(child, options) } if node.respond_to?(:children)
       end
 
       def parse_node_for_multiple_files(_node, options={})
@@ -139,11 +140,11 @@ module ARST
         # TODO: Determine scope of subclass or included/extended module
         nodes_to_check = [node] + node.children
         nodes_with_requirements = nodes_to_check.find_all do |child|
-          [:include, :extend].include?(child.type) || child.type_is?(:class) && child.superclass?
+          [:include, :extend].include?(child.type) || child.type == :class && child.superclass?
         end
 
         nodes_with_requirements.collect! do |child|
-          constant = child.type_is?(:class) ? child.superclass : child.name
+          constant = child.type == :class ? child.superclass : child.name
           ancestry = constant.include?("::") ? constant.split("::") : child.ancestors.collect(&:name)
           path = ancestry.collect { |name| Helpers.underscore(name) }.join("/")
 

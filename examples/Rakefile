@@ -5,6 +5,6 @@ require "arst/rake/task"
 
 ARST::Rake::Task.new do |task|
   task.add_generator(input_path: "methods.arst", output_path: "methods")
-  task.add_generator(input_path: "simple.arst", output_path: "simple", split_files: false)
+  task.add_generator(input_path: "simple.arst", output_path: "simple")
   task.add_generator(input_path: "game.arst", output_path: "game")
 end
